@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>
+        <i class="bi bi-clipboard-check"></i>
+        {{ titulo|default:"Nova Atividade" }}
+    </h2>
+
+    <form method="post" class="mb-4">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                {% for field, errors in form.errors.items %}
+                    <li><strong>{{ field|capfirst }}:</strong> {{ errors.as_text|linebreaksbr }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-5">
+                {% include "partials/textbox.html" with name="nome" label="Nome da Atividade" value=form.data.nome|default:form.initial.nome|default_if_none:"" placeholder="Digite o nome..." required=True %}
+
+            </div>
+            <div class="col-md-4">
+                {% include "partials/select.html" with name="area" label="Área" options=areas value=form.data.area|default:form.initial.area placeholder="Selecione a área" required=True %}
+
+
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                {% include "partials/botao.html" with type="submit" label="Salvar" icon="bi bi-save" class="btn-success" %}
+                <a href="{% url 'atividades:lista' %}" class="btn btn-secondary ms-2">Voltar</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -109,11 +109,7 @@
         <a href="/" class="{% if request.path == '/' %}active{% endif %}">
             <i class="bi bi-house-door-fill"></i>
             <span>Início</span>
-        </a>
-        <a href="#" class="{% if request.path == '/tarefas/' %}active{% endif %}">
-            <i class="bi bi-list-check"></i>
-            <span>Tarefas</span>
-        </a>
+
         <a href="#" class="{% if request.path == '/unidades/' %}active{% endif %}">
             <i class="bi bi-folder2-open"></i>
             <span>Unidades</span>
@@ -121,6 +117,11 @@
         <a href="{% url 'pagina_servidores' %}" class="{% if request.path == '/servidores/' %}active{% endif %}">
             <i class="bi bi-people-fill"></i>
             <span>Servidores</span>
+        </a>
+                </a>
+        <a href="{% url 'atividades:lista' %}" class="{% if request.path == '/atividades/' %}active{% endif %}">
+            <i class="bi bi-list-check"></i>
+            <span>Atividades</span>
         </a>
         <a href="#" class="{% if request.path == '/usuarios/' %}active{% endif %}">
             <i class="bi bi-person-badge-fill"></i>

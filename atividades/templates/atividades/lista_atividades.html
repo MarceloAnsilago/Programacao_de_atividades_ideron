@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">
+        <i class="bi bi-clipboard-check"></i> Cadastrar Atividade
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-5">{% include "partials/textbox.html" with name="nome" label="Nome da Atividade" placeholder="Digite o nome..." required=True %}</div>
+            <div class="col-md-4">{% include "partials/select.html" with name="area" label="Área" options=areas placeholder="Selecione a área" required=True %}</div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">{% include "partials/botao.html" with type="submit" label="Salvar" icon="bi bi-save" class="btn-success" %}</div>
+        </div>
+    </form>
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <ul>
+            {% for field, errors in form.errors.items %}
+                <li><strong>{{ field|capfirst }}:</strong> {{ errors.as_text|linebreaksbr }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-3 mt-4">
+        <i class="bi bi-list-ul"></i> Lista de Atividades
+    </h2>
+
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">{% include "partials/textbox.html" with name="busca" label="Buscar por nome" placeholder="Digite o nome..." value=request.GET.busca %}</div>
+            <div class="col-md-3">{% include "partials/select.html" with name="status" label="Status" options=status_opcoes placeholder="Todos" value=request.GET.status %}</div>
+            <div class="col-md-3">{% include "partials/select.html" with name="area" label="Área" options=areas placeholder="Todas as Áreas" value=request.GET.area %}</div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-2 offset-md-10">{% include "partials/botao.html" with type="submit" label="Buscar" icon="bi bi-search" class="btn-primary w-100" %}</div>
+        </div>
+    </form>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Área</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for atividade in atividades %}
+            <tr>
+                <td>{{ atividade.nome }}</td>
+                <td>{{ atividade.get_area_display }}</td>
+                <td>
+                    {% if atividade.ativo %}
+                        <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inativo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'atividades:editar' atividade.id %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Editar</a>
+                    {% if atividade.ativo %}
+                        <a href="{% url 'atividades:inativar' atividade.id %}" class="btn btn-sm btn-danger"><i class="bi bi-x-circle"></i> Inativar</a>
+                    {% else %}
+                        <a href="{% url 'atividades:ativar' atividade.id %}" class="btn btn-sm btn-success"><i class="bi bi-check-circle"></i> Ativar</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Nenhuma atividade encontrada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
