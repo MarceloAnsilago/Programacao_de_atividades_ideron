@@ -1,0 +1,106 @@
+{% extends 'organizacao/base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">
+        <i class="bi bi-person-plus"></i>
+        Cadastrar Servidor
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-4">
+                {% include "partials/textbox.html" with name="nome" label="Nome do Servidor" placeholder="Digite o nome..." required=True %}
+            </div>
+            <div class="col-md-4">
+                {% include "partials/select.html" with name="cargo" label="Cargo" options=cargos placeholder="Selecione o cargo" required=True %}
+            </div>
+            <div class="col-md-4">
+                {% include "partials/textbox.html" with name="telefone" label="Telefone" placeholder="Digite o telefone..." %}
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-4">
+                {% include "partials/textbox.html" with name="matricula" label="Matrícula" placeholder="Digite a matrícula..." %}
+            </div>
+            <div class="col-12 mt-3">
+                {% include "partials/botao.html" with type="submit" label="Salvar" icon="bi bi-save" class="btn-success" %}
+            </div>
+        </div>
+    </form>
+
+    <h2 class="mb-3 mt-4">
+        <i class="bi bi-list-ul"></i>
+        Lista de Servidores
+    </h2>
+
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                {% include "partials/textbox.html" with name="busca" label="Buscar por nome" placeholder="Digite o nome..." value=request.GET.busca %}
+            </div>
+            <div class="col-md-3">
+                {% include "partials/select.html" with name="status" label="Status" options=status_opcoes placeholder="Todos" value=request.GET.status %}
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" style="visibility: hidden;">&nbsp;</label>
+                {% include "partials/botao.html" with type="submit" label="Buscar" icon="bi bi-search" class="btn-primary w-100" %}
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabela correta com lógica de botões incluída diretamente aqui: -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Cargo</th>
+                <th>Matrícula</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servidor in servidores %}
+            <tr>
+                <td>{{ servidor.nome }}</td>
+                <td>{{ servidor.telefone }}</td>
+                <td>{{ servidor.cargo }}</td>
+                <td>{{ servidor.matricula }}</td>
+                <td>
+                    {% if servidor.status == 'Ativo' %}
+                        <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                        <span class="badge bg-danger">Inativo</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'servidor_editar' servidor.id %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+
+                    {% if servidor.status == 'Ativo' %}
+                        <a href="{% url 'servidor_inativar' servidor.id %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-x-circle"></i> Inativar
+                        </a>
+                    {% else %}
+                        <a href="{% url 'servidor_ativar' servidor.id %}" class="btn btn-sm btn-success">
+                            <i class="bi bi-check-circle"></i> Ativar
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Nenhum servidor encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
