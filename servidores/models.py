@@ -12,8 +12,7 @@ class Servidor(models.Model):
     cargo = models.CharField(max_length=50)
     matricula = models.CharField(max_length=30, unique=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Ativo')
-    
-    # Adicione esse campo:
+
     unidade = models.ForeignKey(Unidade, on_delete=models.CASCADE, related_name='servidores', null=True, blank=True)
 
     def __str__(self):
