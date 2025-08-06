@@ -14,15 +14,26 @@
         Servidores da Unidade
     </h2>
 
+    <!-- Form de filtro por ano e busca -->
     <form method="get" class="mb-4">
-        <div class="row">
-            <div class="col-md-4">
-                {% include "partials/textbox.html" with name="busca" label="Buscar por nome" placeholder="Digite o nome..." value=request.GET.busca %}
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <label for="ano" class="form-label">Ano</label>
+                <select id="ano" name="ano" class="form-select" onchange="this.form.submit()">
+                    {% for ano_item in anos %}
+                        <option value="{{ ano_item }}" {% if ano_item|stringformat:"s" == ano_selecionado|stringformat:"s" %}selected{% endif %}>
+                            {{ ano_item }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="col-md-2 d-flex align-items-end">
-                <div class="w-100">
-                    {% include "partials/botao.html" with type="submit" label="Buscar" icon="bi bi-search" class="btn-primary w-100" %}
-                </div>
+        </div>
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                {% include "partials/textbox.html" with name="busca" label="Buscar por nome" placeholder="Digite o nome..." value=busca %}
+            </div>
+            <div class="col-md-3">
+                {% include "partials/botao.html" with type="submit" label="Buscar" icon="bi bi-search" class="btn-primary w-100" %}
             </div>
         </div>
     </form>
@@ -43,11 +54,15 @@
             <tr>
                 <td>
                     {{ servidor.nome }}
-                    {% if servidor.descansos.exists %}
-                        <span class="badge bg-info text-dark ms-2" title="Este servidor já possui períodos de descanso registrados.">
-                            <i class="bi bi-calendar-check"></i>
-                            {{ servidor.descansos.count }} descanso{{ servidor.descansos.count|pluralize }}
-                        </span>
+                    {% if servidor.descansos.all %}
+                        {% with count=servidor.descansos.all|length %}
+                            {% if count %}
+                                <span class="badge bg-info text-dark ms-2" title="Este servidor já possui períodos de descanso registrados.">
+                                    <i class="bi bi-calendar-check"></i>
+                                    {{ count }} descanso{{ count|pluralize }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
                     {% endif %}
                 </td>
                 <td>{{ servidor.telefone }}</td>
@@ -65,12 +80,12 @@
                         <i class="bi bi-calendar-plus"></i> Cadastrar Descanso
                     </a>
                     <a href="{% url 'ver_descanso' servidor.id %}"
-                       class="btn btn-sm {% if servidor.descansos.exists %}btn-success{% else %}btn-info{% endif %}">
+                       class="btn btn-sm {% if servidor.descansos.all|length %}btn-success{% else %}btn-info{% endif %}">
                         <i class="bi bi-calendar-event"></i>
                         Ver Descansos
-                        {% if servidor.descansos.exists %}
+                        {% if servidor.descansos.all|length %}
                             <span class="ms-1">
-                                ({{ servidor.descansos.count }})
+                                ({{ servidor.descansos.all|length }})
                             </span>
                         {% endif %}
                     </a>
@@ -86,7 +101,7 @@
 
     <!-- BOTÃO CENTRALIZADO ABAIXO DA TABELA -->
     <div class="d-flex justify-content-center mt-4">
-        <a href="{% url 'relatorio_mapa_ferias' %}" class="btn btn-outline-secondary"]>
+        <a href="{% url 'relatorio_mapa_ferias' %}?ano={{ ano_selecionado }}" class="btn btn-outline-secondary">
             <i class="bi bi-printer"></i> Mapa de Férias/Descanso (Imprimir)
         </a>
     </div>

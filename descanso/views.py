@@ -9,20 +9,40 @@ import calendar
 from collections import defaultdict
 import datetime
 
+
 @login_required
 def pagina_descanso(request):
     usuario = request.user
     perfil = getattr(usuario, 'perfilusuario', None)
     unidade = getattr(perfil, 'unidade', None)
-
     busca = request.GET.get('busca', '')
 
+    # 1. Filtre servidores por unidade
     servidores = Servidor.objects.filter(unidade=unidade, status="Ativo") if unidade else Servidor.objects.none()
     if busca:
         servidores = servidores.filter(nome__icontains=busca)
 
+    # 2. Pegue todos os anos dos descansos (unicos)
+    anos = Descanso.objects.values_list('inicio__year', flat=True).distinct().order_by('-inicio__year')
+    anos = list(filter(None, anos))  # Remove possíveis Nones
+
+    # 3. Ano selecionado
+    ano = request.GET.get('ano')
+    if not ano and anos:
+        ano = str(anos[0])  # Padrão para o mais recente
+    elif not anos:
+        ano = None
+
+    # 4. Filtro pelos descansos do ano
+    for servidor in servidores:
+        # "descansos" como related_name (ajuste se precisar)
+        descansos_ano = servidor.descansos.filter(inicio__year=ano) if ano else servidor.descansos.all()
+        servidor.descansos_ano = descansos_ano  # anexa para uso no template
+
     context = {
         "servidores": servidores,
+        "anos": anos,
+        "ano_selecionado": ano,
         "request": request,
     }
     return render(request, "descanso/pagina_descanso.html", context)
