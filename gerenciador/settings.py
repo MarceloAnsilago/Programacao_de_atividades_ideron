@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'servidores',
     'atividades',
     'veiculos',
+    'descanso',
 ]
 
 MIDDLEWARE = [

@@ -132,6 +132,10 @@
             <i class="bi bi-truck-front-fill"></i>
             <span>Veículos</span>
         </a>
+        <a href="{% url 'pagina_descanso' %}" class="{% if request.path == '/descanso/' %}active{% endif %}">
+            <i class="bi bi-calendar-check"></i>
+            <span>Descanso</span>
+        </a>
         {% if request.user.perfilusuario.perfil == 'gerente' %}
             <a href="#" class="{% if request.path == '/admin/' %}active{% endif %}">
                 <i class="bi bi-gear-fill"></i>
