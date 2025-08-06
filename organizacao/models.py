@@ -1,13 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 class Supervisao(models.Model):
     nome = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nome
-
 
 class Unidade(models.Model):
     nome = models.CharField(max_length=100)
@@ -16,7 +14,6 @@ class Unidade(models.Model):
 
     def __str__(self):
         return self.nome
-
 
 class PerfilUsuario(models.Model):
     PERFIS = (

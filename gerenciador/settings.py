@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'organizacao', 
     'servidores',
     'atividades',
+    'veiculos',
 ]
 
 MIDDLEWARE = [

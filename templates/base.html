@@ -127,6 +127,11 @@
             <i class="bi bi-person-badge-fill"></i>
             <span>Usuários</span>
         </a>
+
+        <a href="{% url 'pagina_veiculos' %}" class="{% if request.path == '/veiculos/' %}active{% endif %}">
+            <i class="bi bi-truck-front-fill"></i>
+            <span>Veículos</span>
+        </a>
         {% if request.user.perfilusuario.perfil == 'gerente' %}
             <a href="#" class="{% if request.path == '/admin/' %}active{% endif %}">
                 <i class="bi bi-gear-fill"></i>

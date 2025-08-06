@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="container mt-4 px-4" style="max-width: 1100px;">
+
+    <h2 class="mb-3">
+        <i class="bi bi-truck-front-fill"></i>
+        Cadastrar Veículo
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                {% include "partials/textbox.html" with name="nome" label="Nome do Veículo" placeholder="Digite o nome..." required=True %}
+            </div>
+            <div class="col-md-6">
+                {% include "partials/textbox.html" with name="placa" label="Placa" placeholder="Digite a placa..." required=True %}
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12 d-flex justify-content-start">
+                {% include "partials/botao.html" with type="submit" label="Salvar" icon="bi bi-save" class="btn-success" %}
+            </div>
+        </div>
+    </form>
+
+    <h2 class="mb-3 mt-4">
+        <i class="bi bi-list-ul"></i>
+        Lista de Veículos
+    </h2>
+
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                {% include "partials/textbox.html" with name="busca" label="Buscar por nome" placeholder="Digite o nome..." value=request.GET.busca %}
+            </div>
+            <div class="col-md-4">
+                {% include "partials/textbox.html" with name="placa" label="Buscar por placa" placeholder="Digite a placa..." value=request.GET.placa %}
+            </div>
+            <div class="col-md-2">
+                {% include "partials/select.html" with name="status" label="Status" options=status_opcoes placeholder="Todos" value=request.GET.status %}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <div class="w-100">
+                    {% include "partials/botao.html" with type="submit" label="Buscar" icon="bi bi-search" class="btn-primary w-100" %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Placa</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for veiculo in veiculos %}
+                <tr>
+                    <td>{{ veiculo.nome }}</td>
+                    <td>{{ veiculo.placa }}</td>
+                    <td>
+                        {% if veiculo.status == 'Ativo' %}
+                            <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'editar_veiculos' veiculo.id %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        {% if veiculo.status == 'Ativo' %}
+                            <a href="{% url 'inativar_veiculo' veiculo.id %}" class="btn btn-sm btn-danger">
+                                <i class="bi bi-x-circle"></i> Inativar
+                            </a>
+                        {% else %}
+                            <a href="{% url 'ativar_veiculo' veiculo.id %}" class="btn btn-sm btn-success">
+                                <i class="bi bi-check-circle"></i> Ativar
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Nenhum veículo encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
