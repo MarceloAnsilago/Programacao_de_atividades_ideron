@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">
+        <i class="bi bi-pencil-square"></i>
+        Editar Período de Descanso
+    </h2>
+
+    <div class="mb-4">
+        <h4>
+            <i class="bi bi-person-fill"></i>
+            Servidor: <span class="fw-bold text-uppercase">{{ servidor.nome }}</span>
+        </h4>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3 mb-3">
+            <div class="col-md-5">
+                {% include "partials/calendar.html" with name="inicio" label="Período inicial" value=descanso.inicio|date:"Y-m-d" placeholder="dd/mm/aaaa" required=True %}
+            </div>
+            <div class="col-md-5">
+                {% include "partials/calendar.html" with name="fim" label="Período final" value=descanso.fim|date:"Y-m-d" placeholder="dd/mm/aaaa" required=True %}
+            </div>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-5">
+                {% include "partials/select.html" with name="tipo" label="Tipo de Descanso" options=tipos_descanso value=descanso.tipo required=True %}
+            </div>
+            <div class="col-md-7">
+                {% include "partials/textbox.html" with name="observacao" label="Observação" value=descanso.observacao placeholder="Descreva detalhes, motivo, etc..." %}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save"></i> Salvar Alterações
+        </button>
+        <a href="{% url 'ver_descanso' servidor.id %}" class="btn btn-secondary ms-2">
+            Cancelar
+        </a>
+    </form>
+</div>
+{% endblock %}

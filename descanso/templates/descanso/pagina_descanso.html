@@ -83,5 +83,13 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- BOTÃO CENTRALIZADO ABAIXO DA TABELA -->
+    <div class="d-flex justify-content-center mt-4">
+        <a href="{% url 'relatorio_mapa_ferias' %}" class="btn btn-outline-secondary"]>
+            <i class="bi bi-printer"></i> Mapa de Férias/Descanso (Imprimir)
+        </a>
+    </div>
+
 </div>
 {% endblock %}

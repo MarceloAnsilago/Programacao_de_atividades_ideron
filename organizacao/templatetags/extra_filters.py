@@ -23,3 +23,8 @@ def attr(obj, attr_name):
 def split(value, sep=','):
     """Divide uma string pelo separador informado. Ex: {{ string|split:',' }}"""
     return value.split(sep)
+
+@register.filter
+def get_item(dictionary, key):
+    """Acessa dictionary[key] no template."""
+    return dictionary.get(key)

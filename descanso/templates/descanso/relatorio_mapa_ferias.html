@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-center">
+        <i class="bi bi-printer"></i>
+        Mapa de Férias/Descanso - {{ ano }}
+    </h2>
+    <button class="btn btn-primary mb-3" onclick="window.print()">
+        <i class="bi bi-printer"></i> Imprimir
+    </button>
+    {% for mes_num, mes_nome in meses_label %}
+        <h4>{{ mes_nome }}</h4>
+        <div class="table-responsive mb-4">
+        <table class="table table-bordered table-sm text-center align-middle" style="font-size: 0.85rem;">
+            <thead class="table-secondary">
+                <tr>
+                    <th>Servidor</th>
+                    <th>Dias de Descanso</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% with servidores_mes=mes_mapa|get_item:mes_num %}
+            {% for servidor, dias in servidores_mes.items %}
+                <tr>
+                    <td class="text-start" style="min-width: 180px;">{{ servidor.nome }}</td>
+                    <td>
+                        <div style="display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% for marcado in dias %}
+                            {% if marcado %}
+                                <span title="Descanso"
+                                    style="display: inline-block; width: 22px; height: 22px; line-height: 22px; background: #222; color: #fff; border-radius: 4px;">
+                                    {{ forloop.counter }}
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center">Nenhum descanso nesse mês.</td>
+                </tr>
+            {% endfor %}
+            {% endwith %}
+            </tbody>
+        </table>
+        </div>
+    {% endfor %}
+
+    <a href="{% url 'pagina_descanso' %}" class="btn btn-secondary mt-3">
+        <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+</div>
+<style>
+@media print {
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .btn, .btn-secondary, .btn-outline-secondary, a.btn, .bi-arrow-left {
+        display: none !important;
+    }
+    .sidebar, .navbar, .navbar-brand, .navbar-text, .wrapper > .sidebar {
+        display: none !important;
+    }
+    .content {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    .table {
+        font-size: 0.95rem !important;
+    }
+    h2, h4 {
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    /* Faz as faixas pretas ficarem impressas certinho */
+    span[title="Descanso"] {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+</style>
+{% endblock %}

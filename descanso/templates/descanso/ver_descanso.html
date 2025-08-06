@@ -23,22 +23,32 @@
                 <th>Registrado em</th>
             </tr>
         </thead>
+      
         <tbody>
-            {% for descanso in descansos %}
-            <tr>
-                <td>
-                    <span class="badge bg-secondary">{{ descanso.tipo }}</span>
-                </td>
-                <td>{{ descanso.inicio|date:"d/m/Y" }}</td>
-                <td>{{ descanso.fim|date:"d/m/Y" }}</td>
-                <td>{{ descanso.observacao|default:"-" }}</td>
-                <td>{{ descanso.criado_em|date:"d/m/Y H:i" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center">Nenhum registro de descanso encontrado para este servidor.</td>
-            </tr>
-            {% endfor %}
+        {% for descanso in descansos %}
+        <tr>
+            <td>
+                <span class="badge bg-secondary">{{ descanso.tipo }}</span>
+            </td>
+            <td>{{ descanso.inicio|date:"d/m/Y" }}</td>
+            <td>{{ descanso.fim|date:"d/m/Y" }}</td>
+            <td>{{ descanso.observacao|default:"-" }}</td>
+            <td>{{ descanso.criado_em|date:"d/m/Y H:i" }}</td>
+            <td>
+                <a href="{% url 'editar_descanso' descanso.id %}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="{% url 'excluir_descanso' descanso.id %}" class="btn btn-sm btn-danger"
+                    onclick="return confirm('Tem certeza que deseja excluir este período de descanso?');">
+                    <i class="bi bi-trash"></i> Excluir
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">Nenhum período registrado.</td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 
