@@ -3,36 +3,35 @@
 
 {% block content %}
 <div class="container mt-4">
+    <div class="p-4 mb-4 bg-light rounded-3 shadow">
+        <h2 class="mb-3">
+            <i class="bi bi-pencil"></i>
+            Editar Servidor
+        </h2>
 
-    <h2 class="mb-3">
-        <i class="bi bi-pencil"></i>
-        Editar Servidor
-    </h2>
-
-    <form method="post">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-4">
-                {% include "partials/textbox.html" with name="nome" label="Nome do Servidor" placeholder="Digite o nome..." required=True value=servidor.nome %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-4">
+                    {% include "partials/textbox.html" with name="nome" label="Nome do Servidor" placeholder="Digite o nome..." required=True value=servidor.nome %}
+                </div>
+                <div class="col-md-4">
+                    {% include "partials/select.html" with name="cargo" label="Cargo" options=cargos placeholder="Selecione o cargo" required=True value=servidor.cargo %}
+                </div>
+                <div class="col-md-4">
+                    {% include "partials/textbox.html" with name="telefone" label="Telefone" placeholder="Digite o telefone..." value=servidor.telefone %}
+                </div>
             </div>
-            <div class="col-md-4">
-               {% include "partials/select.html" with name="cargo" label="Cargo" options=cargos placeholder="Selecione o cargo" required=True value=servidor.cargo %}
+            <div class="row mt-2">
+                <div class="col-md-4">
+                    {% include "partials/textbox.html" with name="matricula" label="Matrícula" placeholder="Digite a matrícula..." value=servidor.matricula %}
+                </div>
+                <div class="col-12 mt-3">
+                    {% include "partials/botao.html" with type="submit" label="Salvar" icon="bi bi-save" class="btn-primary" %}
+                    <a href="{% url 'pagina_servidores' %}" class="btn btn-secondary ms-2">Cancelar</a>
+                </div>
             </div>
-            <div class="col-md-4">
-                {% include "partials/textbox.html" with name="telefone" label="Telefone" placeholder="Digite o telefone..." value=servidor.telefone %}
-            </div>
-        </div>
-
-        <div class="row mt-2">
-            <div class="col-md-4">
-                {% include "partials/textbox.html" with name="matricula" label="Matrícula" placeholder="Digite a matrícula..." value=servidor.matricula %}
-            </div>
-            <div class="col-12 mt-3">
-                {% include "partials/botao.html" with type="submit" label="Salvar" icon="bi bi-save" class="btn-primary" %}
-                <a href="{% url 'pagina_servidores' %}" class="btn btn-secondary ms-2">Cancelar</a>
-            </div>
-        </div>
-    </form>
-
+        </form>
+    </div>
 </div>
 {% endblock %}
