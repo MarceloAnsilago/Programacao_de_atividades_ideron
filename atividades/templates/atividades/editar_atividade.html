@@ -3,31 +3,33 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2><i class="bi bi-pencil-square"></i> {{ titulo|default:"Editar Atividade" }}</h2>
+    <div class="p-4 mb-4 bg-light rounded-3 shadow">
+        <h2><i class="bi bi-pencil-square"></i> {{ titulo|default:"Editar Atividade" }}</h2>
 
-    <form method="post">
-        {% csrf_token %}
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                <ul>
-                {% for field, errors in form.errors.items %}
-                    <li><strong>{{ field|capfirst }}:</strong> {{ errors.as_text|linebreaksbr }}</li>
-                {% endfor %}
-                </ul>
+        <form method="post">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <ul>
+                    {% for field, errors in form.errors.items %}
+                        <li><strong>{{ field|capfirst }}:</strong> {{ errors.as_text|linebreaksbr }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <div class="row g-3 mb-3">
+                <div class="col-md-6 col-lg-5">
+                    {% include "partials/textbox.html" with name="nome" label="Nome da Atividade" value=form.nome.value placeholder="Digite o nome..." required=True %}
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    {% include "partials/select.html" with name="area" label="Área" options=areas value=form.area.value placeholder="Selecione a área" required=True %}
+                </div>
             </div>
-        {% endif %}
-        <div class="row g-3 mb-3">
-            <div class="col-md-6 col-lg-5">
-                {% include "partials/textbox.html" with name="nome" label="Nome da Atividade" value=form.nome.value placeholder="Digite o nome..." required=True %}
-            </div>
-            <div class="col-md-6 col-lg-4">
-                {% include "partials/select.html" with name="area" label="Área" options=areas value=form.area.value placeholder="Selecione a área" required=True %}
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success">
-            <i class="bi bi-save"></i> Salvar
-        </button>
-        <a href="{% url 'atividades:lista' %}" class="btn btn-secondary ms-2">Cancelar</a>
-    </form>
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Salvar
+            </button>
+            <a href="{% url 'atividades:lista' %}" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
 </div>
 {% endblock %}

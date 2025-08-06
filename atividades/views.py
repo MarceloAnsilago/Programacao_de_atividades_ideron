@@ -55,7 +55,7 @@ def lista_atividades(request):
         ('inativo', 'Inativo'),
     ]
 
-    return render(request, 'atividades/lista.html', {
+    return render(request, 'atividades/lista_atividades.html', {
         'form': form,
         'atividades': atividades,
         'areas': areas,
