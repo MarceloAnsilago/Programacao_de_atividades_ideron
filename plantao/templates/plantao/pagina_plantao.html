@@ -7,7 +7,7 @@
 <div class="container mt-4 px-4" style="max-width: 1100px;">
     <div class="p-4 mb-4 bg-light rounded-3 shadow">
         <h2 class="mb-3">
-            <i class="bi bi-calendar-plus"></i> Cadastrar Plantão
+            <i class="bi bi-calendar-plus"></i> Cadastrar Plantão para recebimento de vacinas, agrotóxicos e produtos biológicos
         </h2>
         <div class="mb-3">
             <h5 class="mb-3 text-secondary">
@@ -72,7 +72,7 @@
                 {% if periodo_inicial and periodo_final and servidores_options %}
                 <div class="row mb-3">
                     <div class="col-12">
-                        {% include "partials/multiselect.html" with name="servidores_selecionados" label="Selecione os ervidores para compor o Plantão" required=True options=servidores_options help_text="Selecione um ou mais servidores disponíveis para compor o plantão." %}
+                        {% include "partials/multiselect.html" with name="servidores_selecionados" label="Selecione os servidores para compor o Plantão" required=True options=servidores_options help_text="Selecione um ou mais servidores disponíveis para compor o plantão." %}
                     </div>
                 </div>
                 {% endif %}
