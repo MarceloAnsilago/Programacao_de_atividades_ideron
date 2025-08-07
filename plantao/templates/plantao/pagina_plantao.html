@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cadastrar Plantão{% endblock %}
+
+{% block content %}
+<div class="container mt-4 px-4" style="max-width: 1100px;">
+    <div class="p-4 mb-4 bg-light rounded-3 shadow">
+        <h2 class="mb-3">
+            <i class="bi bi-calendar-plus"></i> Cadastrar Plantão
+        </h2>
+        <div class="mb-3">
+            <h5 class="mb-3 text-secondary">
+                <i class="bi bi-info-circle"></i>
+                Informe o período
+            </h5>
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {% include "partials/calendar.html" with name="periodo_inicial" label="Período Inicial" required=True value=periodo_inicial %}
+                    </div>
+                    <div class="col-md-6">
+                        {% include "partials/calendar.html" with name="periodo_final" label="Período Final" required=True value=periodo_final %}
+                    </div>
+                </div>
+                
+                {% if periodo_inicial and periodo_final %}
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="alert alert-success">
+                            <h5>
+                                <i class="bi bi-check-circle"></i>
+                                Servidores livres
+                            </h5>
+                            <ul class="mb-0">
+                                {% for servidor in servidores_livres %}
+                                    <li>{{ servidor.nome }}</li>
+                                {% empty %}
+                                    <li>Nenhum servidor disponível.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h5>
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Servidores em descanso no período
+                            </h5>
+                            <ul class="mb-0">
+                                {% for servidor, descansos in servidores_em_descanso %}
+                                    <li>
+                                        <strong>{{ servidor.nome }}</strong>
+                                        <ul class="mb-0">
+                                            {% for d in descansos %}
+                                                <li>
+                                                    {{ d.inicio|date:"d/m/Y" }} - {{ d.fim|date:"d/m/Y" }} ({{ d.tipo }})
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% empty %}
+                                    <li>Nenhum servidor em descanso neste período.</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                {% if periodo_inicial and periodo_final and servidores_options %}
+                <div class="row mb-3">
+                    <div class="col-12">
+                        {% include "partials/multiselect.html" with name="servidores_selecionados" label="Selecione os ervidores para compor o Plantão" required=True options=servidores_options help_text="Selecione um ou mais servidores disponíveis para compor o plantão." %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div>
+                    {% include "partials/botao.html" with type="submit" label="Gerar Plantão" icon="bi bi-gear" class="btn-success" %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if periodo_inicial and periodo_final and servidores_options %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aguarda um pequeno tempo para garantir que o Select2 inicializou
+        setTimeout(function() {
+            $('.form-multi-select').select2('open');
+        }, 350);
+    });
+</script>
+{% endif %}
+{% endblock %}
