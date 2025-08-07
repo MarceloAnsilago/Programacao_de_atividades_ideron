@@ -1,0 +1,20 @@
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}{% if required %}*{% endif %}</label>
+  <select
+    class="form-multi-select"
+    name="{{ name }}"
+    id="{{ name }}"
+    multiple
+    {% if required %}required{% endif %}
+    style="width:100%;"
+  >
+    {% for option in options %}
+      <option value="{{ option.value }}" {% if option.selected %}selected{% endif %}>
+        {{ option.label }}
+      </option>
+    {% endfor %}
+  </select>
+  {% if help_text %}
+    <small class="form-text text-muted">{{ help_text }}</small>
+  {% endif %}
+</div>

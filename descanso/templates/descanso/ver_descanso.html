@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="p-4 mb-4 bg-light rounded-3 shadow">
+
+        <h2 class="mb-3">
+            <i class="bi bi-calendar-event"></i>
+            Descansos do Servidor
+        </h2>
+
+        <h4 class="mb-4">
+            <i class="bi bi-person-fill"></i>
+            Servidor: <span class="fw-bold text-uppercase">{{ servidor.nome }}</span>
+        </h4>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Período Inicial</th>
+                    <th>Período Final</th>
+                    <th>Observação</th>
+                    <th>Registrado em</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for descanso in descansos %}
+            <tr>
+                <td>
+                    <span class="badge bg-secondary">{{ descanso.tipo }}</span>
+                </td>
+                <td>{{ descanso.inicio|date:"d/m/Y" }}</td>
+                <td>{{ descanso.fim|date:"d/m/Y" }}</td>
+                <td>{{ descanso.observacao|default:"-" }}</td>
+                <td>{{ descanso.criado_em|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'editar_descanso' descanso.id %}" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a href="{% url 'excluir_descanso' descanso.id %}" class="btn btn-sm btn-danger"
+                        onclick="return confirm('Tem certeza que deseja excluir este período de descanso?');">
+                        <i class="bi bi-trash"></i> Excluir
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Nenhum período registrado.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'pagina_descanso' %}" class="btn btn-secondary mt-3">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}

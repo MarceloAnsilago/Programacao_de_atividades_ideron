@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-3">
+        <i class="bi bi-calendar-check"></i>
+        Descanso / Férias dos Servidores
+    </h2>
+
+    <!-- Jumbotron da pesquisa/filtro -->
+    <div class="p-4 mb-4 bg-light rounded-3 shadow">
+        <h3 class="mb-3">
+            <i class="bi bi-search"></i>
+            Pesquisar Servidores
+        </h3>
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="ano" class="form-label">Ano</label>
+                <select id="ano" name="ano" class="form-select" onchange="this.form.submit()">
+                    {% for ano_item in anos %}
+                        <option value="{{ ano_item }}" {% if ano_item|stringformat:"s" == ano_selecionado|stringformat:"s" %}selected{% endif %}>
+                            {{ ano_item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="busca" class="form-label">Buscar por nome</label>
+                <input type="text" name="busca" id="busca" class="form-control" placeholder="Digite o nome..." value="{{ busca }}">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Jumbotron da lista -->
+    <div class="p-4 mb-4 bg-light rounded-3 shadow">
+        <h3 class="mb-3">
+            <i class="bi bi-list-ul"></i>
+            Servidores da Unidade
+        </h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Cargo</th>
+                    <th>Matrícula</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servidor in servidores %}
+                <tr>
+                    <td>
+                        {{ servidor.nome }}
+                        {% if servidor.descansos_ano %}
+                            {% with count=servidor.descansos_ano|length %}
+                                {% if count %}
+                                    <span class="badge bg-info text-dark ms-2" title="Este servidor já possui períodos de descanso registrados.">
+                                        <i class="bi bi-calendar-check"></i>
+                                        {{ count }} descanso{{ count|pluralize }}
+                                    </span>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </td>
+                    <td>{{ servidor.telefone }}</td>
+                    <td>{{ servidor.cargo }}</td>
+                    <td>{{ servidor.matricula }}</td>
+                    <td>
+                        {% if servidor.status == 'Ativo' %}
+                            <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'cadastrar_descanso' servidor.id %}" class="btn btn-sm btn-primary mb-1">
+                            <i class="bi bi-calendar-plus"></i> Cadastrar Descanso
+                        </a>
+                        <a href="{% url 'ver_descanso' servidor.id %}"
+                           class="btn btn-sm {% if servidor.descansos_ano|length %}btn-success{% else %}btn-info{% endif %}">
+                            <i class="bi bi-calendar-event"></i>
+                            Ver Descansos
+                            {% if servidor.descansos_ano|length %}
+                                <span class="ms-1">
+                                    ({{ servidor.descansos_ano|length }})
+                                </span>
+                            {% endif %}
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">Nenhum servidor encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center mt-4">
+            <a href="{% url 'relatorio_mapa_ferias' %}?ano={{ ano_selecionado }}" class="btn btn-outline-secondary">
+                <i class="bi bi-printer"></i> Mapa de Férias/Descanso (Imprimir)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

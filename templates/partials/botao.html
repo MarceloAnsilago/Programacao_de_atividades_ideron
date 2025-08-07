@@ -1,0 +1,6 @@
+<button type="{{ type }}" class="btn {{ class|default:'btn-primary' }}">
+    {% if icon %}
+        <i class="{{ icon }}"></i>
+    {% endif %}
+    {{ label }}
+</button>

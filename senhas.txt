@@ -1,0 +1,24 @@
+
+Agora você pode fazer login com:
+Usuário: admin
+Senha: admin123321
+--------------------------
+Usuário: gerenteteste
+Senha:   gerente123
+
+--------------------------
+Usuário: supervidorteste
+Senha:  2RqH@pJ3ZwfY
+
+--------------------------
+--------------------------
+Usuário: UsuarioUlsavUm
+Senha:  teste321
+
+--------------------------
+Usuário: UsuarioUlsavDois
+Senha:  teste321
+
+--------------------------
+ulsavtres
+teste1232
