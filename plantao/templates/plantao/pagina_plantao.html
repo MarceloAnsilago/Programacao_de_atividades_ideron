@@ -5,6 +5,16 @@
 
 {% block content %}
 <div class="container mt-4 px-4" style="max-width: 1100px;">
+         {% if messages %}
+        <div class="mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div class="p-4 mb-4 bg-light rounded-3 shadow">
         <h2 class="mb-3">
             <i class="bi bi-calendar-plus"></i> Cadastrar Plantão para recebimento de vacinas, agrotóxicos e produtos biológicos
@@ -81,6 +91,116 @@
                     {% include "partials/botao.html" with type="submit" label="Gerar Plantão" icon="bi bi-gear" class="btn-success" %}
                 </div>
             </form>
+            
+            {# TABELA DE PLANTÃO: exibe após gerar o plantão #}
+            {% if tabela_plantao %}
+                <div class="card mt-4 shadow">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-table"></i>
+                            Escala de Plantão (Sábado a Sexta)
+                            {% if meses_plantao %}
+                                {% if meses_plantao|length == 1 %}
+                                    para o mês de: {{ meses_plantao.0 }}
+                                {% elif meses_plantao|length == 2 %}
+                                    para os meses de: {{ meses_plantao.0 }} e {{ meses_plantao.1 }}
+                                {% else %}
+                                    para os meses de:
+                                    {% for m in meses_plantao %}
+                                        {{ m }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endif %}
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered m-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Semana</th>
+                                    <th>Período</th>
+                                    <th>Servidor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for semana in tabela_plantao %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            {{ semana.inicio|date:"d/m/Y" }} a {{ semana.fim|date:"d/m/Y" }}
+                                        </td>
+                                        <td>
+                                            {% if semana.servidor %}
+                                                {{ semana.servidor.nome }}
+                                            {% else %}
+                                                <span class="text-danger">Nenhum disponível</span>
+                                                {% if semana.impedido_info %}
+                                                    <br><small class="text-muted">{{ semana.impedido_info }}</small>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+            {% if impedimentos_msgs %}
+                <div class="alert alert-warning mt-3">
+                    <h6 class="mb-1">Avisos sobre impedimentos:</h6>
+                    <ul class="mb-0">
+                        {% for msg in impedimentos_msgs %}
+                            <li>{{ msg }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {# Botões e Modal de salvar plantão, só aparecem após gerar tabela #}
+            {% if tabela_plantao %}
+                <div class="mt-4 d-flex gap-2">
+                    <!-- Botão que abre o modal -->
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalConfirmarPlantao">
+                        <i class="bi bi-save"></i> Salvar Plantão
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+
+                <!-- Modal de confirmação do nome do plantão -->
+                <div class="modal fade" id="modalConfirmarPlantao" tabindex="-1" aria-labelledby="modalConfirmarPlantaoLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <form method="post" action="{% url 'plantao:salvar_plantao' %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="modalConfirmarPlantaoLabel">Confirmar nome do Plantão</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                            <label for="nomePlantao" class="form-label">Nome do Plantão:</label>
+                            <input type="text" class="form-control" id="nomePlantao" name="nome_plantao"
+                                    value="Plantão {{ periodo_inicial }} a {{ periodo_final }}">
+                            <input type="hidden" name="periodo_inicial" value="{{ periodo_inicial }}">
+                            <input type="hidden" name="periodo_final" value="{{ periodo_final }}">
+                            {# Se quiser enviar os servidores, inclua um hidden por id selecionado #}
+                            {% for option in servidores_options %}
+                                {% if option.selected %}
+                                    <input type="hidden" name="servidores_selecionados" value="{{ option.value }}">
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar</button>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -88,7 +208,6 @@
 {% if periodo_inicial and periodo_final and servidores_options %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Aguarda um pequeno tempo para garantir que o Select2 inicializou
         setTimeout(function() {
             $('.form-multi-select').select2('open');
         }, 350);
