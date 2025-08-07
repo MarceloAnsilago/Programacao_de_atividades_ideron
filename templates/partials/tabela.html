@@ -28,13 +28,8 @@
                 {% if acoes %}
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <a href="{% url 'servidor_editar' obj.id %}" class="btn btn-sm btn-warning d-flex align-items-center gap-1" title="Editar">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <a href="{% url 'servidor_inativar' obj.id %}" class="btn btn-sm btn-danger d-flex align-items-center gap-1" title="Inativar"
-                               onclick="return confirm('Tem certeza que deseja inativar?')">
-                                <i class="bi bi-slash-circle"></i> Inativar
-                            </a>
+                            {% include "partials/botao.html" with url=abrir_url_name obj=obj type="button" class="btn-primary btn-sm" icon="bi bi-box-arrow-up-right" label="Abrir" %}
+                            {% include "partials/botao.html" with url=excluir_url_name obj=obj type="button" class="btn-danger btn-sm" icon="bi bi-trash" label="Excluir" %}
                         </div>
                     </td>
                 {% endif %}

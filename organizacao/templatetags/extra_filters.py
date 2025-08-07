@@ -22,6 +22,8 @@ def attr(obj, attr_name):
 @register.filter
 def split(value, sep=','):
     """Divide uma string pelo separador informado. Ex: {{ string|split:',' }}"""
+    if not value:
+        return []
     return value.split(sep)
 
 @register.filter

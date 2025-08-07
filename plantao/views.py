@@ -1,14 +1,18 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from servidores.models import Servidor
-from descanso.models import Descanso
+from django.contrib import messages
 from django.db.models import Q
+from django.db.models.functions import ExtractYear
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 import datetime
 import locale
-from django.contrib import messages
-from organizacao.models import Unidade 
-from django.shortcuts import render, redirect
+
+from descanso.models import Descanso
+from organizacao.models import Unidade
+
 from .models import Plantao, SemanaPlantao
+from servidores.models import Servidor
 
 def gerar_plantao_semana_com_impedimentos(servidores, descansos, data_inicio, data_fim):
     semanas = []
@@ -164,6 +168,7 @@ def pagina_plantao(request):
 
     return render(request, "plantao/pagina_plantao.html", context)
 
+
 @login_required
 def salvar_plantao(request):
     if request.method == "POST":
@@ -188,7 +193,7 @@ def salvar_plantao(request):
         ).exists()
 
         if existe:
-            messages.warning(request, "Esta operação foi anulada, já existe um plantão cadastrados para os dias solicitados")
+            messages.warning(request, "Esta operação foi anulada, já existe um plantão cadastrado para os dias solicitados")
             return redirect('plantao:pagina_plantao')
 
         # Cria o Plantão
@@ -200,27 +205,78 @@ def salvar_plantao(request):
             criado_por=request.user
         )
 
-        # Salva as semanas do plantão
-        data_inicio = periodo_inicial
-        data_fim = periodo_final
-        semanas = []
-        inicio_semana = data_inicio
-        while inicio_semana.weekday() != 5:  # Sábado
-            inicio_semana += datetime.timedelta(days=1)
-        while inicio_semana <= data_fim:
-            fim_semana = min(inicio_semana + datetime.timedelta(days=6), data_fim)
-            semanas.append((inicio_semana, fim_semana))
-            inicio_semana = fim_semana + datetime.timedelta(days=1)
+        # --- Salvar servidores selecionados ---
+        servidores_ids = request.POST.getlist('servidores_selecionados')
+        if not servidores_ids:
+            messages.error(request, "Selecione ao menos um servidor.")
+            plantao.delete()
+            return redirect('plantao:pagina_plantao')
 
-        for semana in semanas:
+        # --- Gera as semanas do plantão (sábado a sexta) ---
+        semanas = []
+        data_inicio = periodo_inicial
+
+        # Acha o primeiro sábado >= data_inicio
+        while data_inicio.weekday() != 5 and data_inicio <= periodo_final:
+            data_inicio += datetime.timedelta(days=1)
+
+        while data_inicio <= periodo_final:
+            fim_semana = min(data_inicio + datetime.timedelta(days=6), periodo_final)
+            semanas.append((data_inicio, fim_semana))
+            data_inicio = fim_semana + datetime.timedelta(days=1)
+
+        # --- Salva as semanas do plantão com rodízio dos servidores ---
+        for i, (semana_inicio, semana_fim) in enumerate(semanas):
+            servidor_id = servidores_ids[i % len(servidores_ids)]
             SemanaPlantao.objects.create(
                 plantao=plantao,
-                data_inicio=semana[0],
-                data_fim=semana[1],
-                motivo_bloqueio='' # ajuste se quiser adicionar motivo
+                data_inicio=semana_inicio,
+                data_fim=semana_fim,
+                servidor_id=servidor_id,
+                motivo_bloqueio=''  # ajuste conforme seu modelo
             )
 
         messages.success(request, "Plantão salvo com sucesso!")
         return redirect('plantao:pagina_plantao')
     else:
         return redirect('plantao:pagina_plantao')
+
+
+
+
+def lista_plantoes(request):
+    anos = Plantao.objects.annotate(ano=ExtractYear('periodo_inicial')).values_list('ano', flat=True).distinct().order_by('-ano')
+    ano_selecionado = request.GET.get('ano')
+
+    if ano_selecionado:
+        plantoes = Plantao.objects.annotate(ano=ExtractYear('periodo_inicial')).filter(ano=int(ano_selecionado)).order_by('-periodo_inicial')
+    else:
+        plantoes = Plantao.objects.all().order_by('-periodo_inicial')
+
+    # Adicione um atributo 'periodo_str' em cada plantão para a tabela
+    for plantao in plantoes:
+        plantao.periodo_str = f"{plantao.periodo_inicial.strftime('%d/%m/%Y')} a {plantao.periodo_final.strftime('%d/%m/%Y')}"
+    return render(request, 'plantao/lista_plantoes.html', {
+        'plantoes': plantoes,
+        'anos': anos,
+        'ano_selecionado': ano_selecionado,
+    })
+
+
+
+
+def escala_plantao_ajax(request, id):
+    plantao = Plantao.objects.get(id=id)
+    semanas = SemanaPlantao.objects.filter(plantao=plantao).order_by('data_inicio')
+    html = render_to_string('partials/partial_escala_plantao.html', {
+        'plantao': plantao,
+        'semanas': semanas,
+    })
+    return JsonResponse({'html': html})
+
+
+def excluir_plantao(request, id):
+    plantao = get_object_or_404(Plantao, id=id)
+    plantao.delete()
+    messages.success(request, "Plantão excluído com sucesso.")
+    return redirect('plantao:lista_plantoes')

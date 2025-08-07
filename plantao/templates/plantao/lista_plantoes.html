@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Plantões cadastrados{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <div class="p-4 bg-light rounded-3 shadow">
+
+        <h2 class="mb-4">
+            <i class="bi bi-calendar-week"></i> Plantões cadastrados
+        </h2>
+
+        <form method="get" class="mb-3" style="max-width: 220px;">
+            <label for="ano" class="form-label">Filtrar por ano:</label>
+            <select name="ano" id="ano" class="form-select" onchange="this.form.submit()">
+                <option value="">Todos os anos</option>
+                {% for ano in anos %}
+                    <option value="{{ ano }}" {% if ano|stringformat:"s" == ano_selecionado %}selected{% endif %}>{{ ano }}</option>
+                {% endfor %}
+            </select>
+            {% if ano_selecionado %}
+                <a href="{% url 'plantao:lista_plantoes' %}" class="btn btn-outline-secondary btn-sm mt-2">Limpar filtro</a>
+            {% endif %}
+        </form>
+
+        <table class="table table-hover table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nome</th>
+                    <th>Período</th>
+                    <th>Unidade</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obj in plantoes %}
+                <tr>
+                    <td>{{ obj.nome }}</td>
+                    <td>{{ obj.periodo_str }}</td>
+                    <td>{{ obj.unidade }}</td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-primary btn-sm btn-abrir-escala"
+                                data-id="{{ obj.id }}">
+                            <i class="bi bi-box-arrow-up-right"></i> Abrir
+                        </button>
+                        <a href="{% url 'plantao:excluir_plantao' obj.id %}" class="btn btn-danger btn-sm"
+                           onclick="return confirm('Deseja realmente excluir este plantão?')">
+                            <i class="bi bi-trash"></i> Excluir
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">Nenhum registro encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Aqui vai aparecer o detalhe do plantão aberto -->
+        <div id="detalhe-escala-plantao"></div>
+
+        <a href="{% url 'plantao:pagina_plantao' %}" class="btn btn-secondary mt-3">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-abrir-escala').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            var detalheDiv = document.getElementById('detalhe-escala-plantao');
+            // Mostra loading
+            detalheDiv.innerHTML = '<div class="text-center p-4"><div class="spinner-border"></div> Carregando...</div>';
+            fetch('/plantao/escala/' + id + '/')
+                .then(response => response.json())
+                .then(data => {
+                    detalheDiv.innerHTML = data.html;
+                    detalheDiv.scrollIntoView({behavior: "smooth"});
+                });
+        });
+    });
+});
+</script>
+{% endblock %}
