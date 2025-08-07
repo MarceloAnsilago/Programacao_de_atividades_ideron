@@ -5,6 +5,10 @@ from descanso.models import Descanso
 from django.db.models import Q
 import datetime
 import locale
+from django.contrib import messages
+from organizacao.models import Unidade 
+from django.shortcuts import render, redirect
+from .models import Plantao, SemanaPlantao
 
 def gerar_plantao_semana_com_impedimentos(servidores, descansos, data_inicio, data_fim):
     semanas = []
@@ -159,3 +163,71 @@ def pagina_plantao(request):
     }
 
     return render(request, "plantao/pagina_plantao.html", context)
+
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import Plantao, SemanaPlantao
+import datetime
+
+@login_required
+def salvar_plantao(request):
+    if request.method == "POST":
+        periodo_inicial_str = request.POST.get('periodo_inicial')
+        periodo_final_str = request.POST.get('periodo_final')
+        nome = request.POST.get('nome_plantao')
+        unidade_id = request.user.perfilusuario.unidade_id
+
+        # Converte as datas de string para date
+        try:
+            periodo_inicial = datetime.datetime.strptime(periodo_inicial_str, "%Y-%m-%d").date()
+            periodo_final = datetime.datetime.strptime(periodo_final_str, "%Y-%m-%d").date()
+        except Exception:
+            messages.error(request, "Erro ao processar as datas.")
+            return redirect('plantao:pagina_plantao')
+
+        # Verifica sobreposição de plantões
+        existe = Plantao.objects.filter(
+            unidade_id=unidade_id,
+            periodo_inicial__lte=periodo_final,
+            periodo_final__gte=periodo_inicial
+        ).exists()
+
+        if existe:
+            messages.warning(request, "Já existe um plantão cadastrado para esse período e unidade.")
+            return redirect('plantao:pagina_plantao')
+
+        # Cria o Plantão
+        plantao = Plantao.objects.create(
+            nome=nome or f"Plantão {periodo_inicial} a {periodo_final}",
+            periodo_inicial=periodo_inicial,
+            periodo_final=periodo_final,
+            unidade_id=unidade_id,
+            criado_por=request.user
+        )
+
+        # Salva as semanas do plantão
+        data_inicio = periodo_inicial
+        data_fim = periodo_final
+        semanas = []
+        inicio_semana = data_inicio
+        while inicio_semana.weekday() != 5:  # Sábado
+            inicio_semana += datetime.timedelta(days=1)
+        while inicio_semana <= data_fim:
+            fim_semana = min(inicio_semana + datetime.timedelta(days=6), data_fim)
+            semanas.append((inicio_semana, fim_semana))
+            inicio_semana = fim_semana + datetime.timedelta(days=1)
+
+        for semana in semanas:
+            SemanaPlantao.objects.create(
+                plantao=plantao,
+                data_inicio=semana[0],
+                data_fim=semana[1],
+                motivo_bloqueio='' # ajuste se quiser adicionar motivo
+            )
+
+        messages.success(request, "Plantão salvo com sucesso!")
+        return redirect('plantao:pagina_plantao')
+    else:
+        return redirect('plantao:pagina_plantao')

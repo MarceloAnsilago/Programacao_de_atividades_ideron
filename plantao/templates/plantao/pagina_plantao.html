@@ -147,6 +147,50 @@
                 </div>
             {% endif %}
 
+            {# Botões e Modal de salvar plantão, só aparecem após gerar tabela #}
+            {% if tabela_plantao %}
+                <div class="mt-4 d-flex gap-2">
+                    <!-- Botão que abre o modal -->
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalConfirmarPlantao">
+                        <i class="bi bi-save"></i> Salvar Plantão
+                    </button>
+                    <button class="btn btn-secondary" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+
+                <!-- Modal de confirmação do nome do plantão -->
+                <div class="modal fade" id="modalConfirmarPlantao" tabindex="-1" aria-labelledby="modalConfirmarPlantaoLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <form method="post" action="{% url 'plantao:salvar_plantao' %}">
+                            {% csrf_token %}
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="modalConfirmarPlantaoLabel">Confirmar nome do Plantão</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                            <label for="nomePlantao" class="form-label">Nome do Plantão:</label>
+                            <input type="text" class="form-control" id="nomePlantao" name="nome_plantao"
+                                    value="Plantão {{ periodo_inicial }} a {{ periodo_final }}">
+                            <input type="hidden" name="periodo_inicial" value="{{ periodo_inicial }}">
+                            <input type="hidden" name="periodo_final" value="{{ periodo_final }}">
+                            {# Se quiser enviar os servidores, inclua um hidden por id selecionado #}
+                            {% for option in servidores_options %}
+                                {% if option.selected %}
+                                    <input type="hidden" name="servidores_selecionados" value="{{ option.value }}">
+                                {% endif %}
+                            {% endfor %}
+                            </div>
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Salvar</button>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -154,7 +198,6 @@
 {% if periodo_inicial and periodo_final and servidores_options %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Aguarda um pequeno tempo para garantir que o Select2 inicializou
         setTimeout(function() {
             $('.form-multi-select').select2('open');
         }, 350);

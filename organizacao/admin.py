@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Supervisao, Unidade, PerfilUsuario
 
+
 @admin.register(Supervisao)
 class SupervisaoAdmin(admin.ModelAdmin):
     list_display = ('id', 'nome')
@@ -17,3 +18,4 @@ class PerfilUsuarioAdmin(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'perfil', 'supervisao', 'unidade')
     list_filter = ('perfil',)
     search_fields = ('usuario__username', 'usuario__first_name', 'usuario__last_name')
+
