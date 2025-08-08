@@ -61,6 +61,7 @@
           <th>Status</th>
           <th>Unidade</th>
           <th>Supervisão</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -82,10 +83,16 @@
           </td>
           <td>{{ meta.destinatario_unidade }}</td>
           <td>{{ meta.destinatario_supervisao }}</td>
+          <td>
+            <a href="{% url 'metas:atribuir_meta' meta.id %}" class="btn btn-sm btn-primary">
+              <i class="bi bi-share"></i> Atribuir
+            </a>
+            <!-- Pode adicionar outros botões aqui futuramente -->
+          </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="text-center">Nenhuma meta cadastrada para esta atividade.</td>
+          <td colspan="7" class="text-center">Nenhuma meta cadastrada para esta atividade.</td>
         </tr>
         {% endfor %}
       </tbody>

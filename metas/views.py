@@ -93,3 +93,9 @@ def definir_meta(request, pk):
         'meta_atividade': atividade,
         'metas': metas,
     })
+
+@login_required
+def atribuir_meta(request, meta_id):
+    meta = get_object_or_404(Meta, id=meta_id)
+    # Aqui você pode depois adicionar lógica de atribuição, form, etc.
+    return render(request, 'metas/atribuir.html', {'meta': meta})
