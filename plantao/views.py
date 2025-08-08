@@ -283,3 +283,12 @@ def excluir_plantao(request, id):
     plantao.delete()
     messages.success(request, "Plantão excluído com sucesso.")
     return redirect('plantao:lista_plantoes')
+
+
+def imprimir_plantao(request, plantao_id):
+    plantao = get_object_or_404(Plantao, pk=plantao_id)
+    semanas = SemanaPlantao.objects.filter(plantao=plantao).select_related('servidor').order_by('data_inicio')
+    return render(request, 'plantao/imprimir_plantao.html', {
+        'plantao': plantao,
+        'semanas': semanas,
+    })

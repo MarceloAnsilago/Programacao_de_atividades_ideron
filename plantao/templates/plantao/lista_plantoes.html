@@ -42,6 +42,9 @@
                                 data-id="{{ obj.id }}">
                             <i class="bi bi-box-arrow-up-right"></i> Abrir
                         </button>
+                            <a href="{% url 'plantao:imprimir_plantao' obj.id %}" class="btn btn-secondary btn-sm">
+                                <i class="bi bi-printer"></i> Imprimir
+                            </a>
                         <a href="{% url 'plantao:excluir_plantao' obj.id %}" class="btn btn-danger btn-sm"
                            onclick="return confirm('Deseja realmente excluir este plantão?')">
                             <i class="bi bi-trash"></i> Excluir
