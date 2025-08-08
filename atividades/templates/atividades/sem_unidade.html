@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="alert alert-warning mt-4">
+    {{ mensagem|default:"Seu usuário não está vinculado a nenhuma unidade. Contate o administrador." }}
+</div>
+{% endblock %}
