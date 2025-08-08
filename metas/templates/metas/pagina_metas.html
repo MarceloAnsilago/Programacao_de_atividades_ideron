@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load extra_filters %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- JUMBOTRON: Só o título -->
+  <div class="p-4 mb-4 bg-light rounded-3 shadow">
+    <h2 class="mb-3">
+      <i class="bi bi-bullseye"></i> Gerenciar Metas
+    </h2>
+  </div>
+
+  <!-- JUMBOTRON: Pesquisa + Lista de Metas -->
+  <div class="p-4 mb-4 bg-light rounded-3 shadow">
+    <h2 class="mb-3">
+      <i class="bi bi-list-ul"></i> Lista de Atividades
+    </h2>
+    <!-- FORMULÁRIO DE FILTRO -->
+    <form method="get" class="row g-3 align-items-end mb-4">
+      <div class="col-md-6 col-lg-5">
+        {% include "partials/textbox.html" with name="busca" label="Buscar" placeholder="Digite o nome..." value=request.GET.busca %}
+      </div>
+      <div class="col-md-3 col-lg-3">
+        {% include "partials/select.html" with name="status" label="Status" options=status_opcoes placeholder="Todos" value=request.GET.status %}
+      </div>
+      <div class="col-md-2 col-lg-3">
+        {% include "partials/select.html" with name="area" label="Área" options=areas placeholder="Todas as Áreas" value=request.GET.area %}
+      </div>
+      <div class="col-md-1 col-lg-1 d-grid">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+      </div>
+    </form>
+    <table class="table table-striped table-hover mt-4">
+      <thead class="table-light">
+        <tr>
+          <th>Nome</th>
+          <th>Área</th>
+          <th>Status</th>
+          <th>Definir</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for meta in metas %}
+        <tr>
+          <td>{{ meta.nome }}</td>
+          <td>{{ meta.get_area_display }}</td>
+          <td>
+            {% if meta.ativo %}
+              <span class="badge bg-success">Ativo</span>
+            {% else %}
+              <span class="badge bg-danger">Inativo</span>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'metas:definir' meta.id %}" class="btn btn-sm btn-primary">
+              <i class="bi bi-pencil-square"></i> Definir metas/atribuir
+            </a>
+     
+       
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center">Nenhuma meta encontrada.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

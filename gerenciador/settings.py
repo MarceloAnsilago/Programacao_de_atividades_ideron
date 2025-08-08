@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'atividades',
     'veiculos',
     'descanso',
-    'plantao'
+    'plantao',
+    'metas',
 ]
 
 MIDDLEWARE = [

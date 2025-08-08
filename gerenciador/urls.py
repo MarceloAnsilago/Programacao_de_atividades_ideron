@@ -28,4 +28,6 @@ urlpatterns = [
     path('veiculos/', include('veiculos.urls')),
     path('descanso/', include('descanso.urls')),
     path('plantao/', include('plantao.urls')),
+    path('metas/', include(('metas.urls', 'metas'), namespace='metas')),
+    
 ]
