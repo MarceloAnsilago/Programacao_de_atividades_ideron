@@ -15,6 +15,7 @@
                     <th>Semana</th>
                     <th>Período</th>
                     <th>Servidor</th>
+                    <th>Telefone</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,6 +28,11 @@
                                 {{ semana.servidor.nome }}
                             {% else %}
                                 <span class="text-danger">Nenhum disponível</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if semana.servidor %}
+                                {{ semana.servidor.telefone }}
                             {% endif %}
                         </td>
                     </tr>
