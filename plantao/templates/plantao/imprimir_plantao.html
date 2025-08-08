@@ -75,16 +75,17 @@
 <script>
 function imprimirEscala() {
     var conteudo = document.getElementById('container-impressao').innerHTML;
-    var win = window.open('', '', 'width=900,height=700');
+    var width = window.screen.availWidth;
+    var height = window.screen.availHeight;
+    var win = window.open('', '', 'width=' + width + ',height=' + height + ',left=0,top=0');
     win.document.write('<html><head><title>Impressão - Escala de Plantão</title>');
     win.document.write('<style>');
-    win.document.write('body{background:#fff;margin:0;padding:0;font-family:sans-serif;}');
+    win.document.write('body{background:#fff;margin:24px;font-family:sans-serif;}');
+    win.document.write('h2{font-size:2em;margin-bottom:0.2em;}');
     win.document.write('table{width:100%;border-collapse:collapse;margin-top:24px;}');
-    win.document.write('th,td{border:1px solid #888;padding:6px 10px;text-align:left;font-size:1.1em;}');
+    win.document.write('th,td{border:1px solid #888;padding:8px 12px;text-align:left;font-size:1.1em;}');
     win.document.write('th{background:#f3f3f3;}');
-    win.document.write('img{max-height:60px;margin-bottom:10px;}');
-    win.document.write('h2{margin:0;font-weight:600;font-size:2em;}');
-    win.document.write('a,button{display:none !important;}');
+    win.document.write('tr:nth-child(even){background:#fafbfc;}');
     win.document.write('</style>');
     win.document.write('</head><body>');
     win.document.write(conteudo);
@@ -95,5 +96,6 @@ function imprimirEscala() {
         win.close();
     }, 300);
 }
+
 </script>
 {% endblock %}
