@@ -206,17 +206,18 @@ def salvar_plantao(request):
         )
 
         # --- Salvar servidores selecionados ---
+      
         servidores_ids = request.POST.getlist('servidores_selecionados')
         if not servidores_ids:
             messages.error(request, "Selecione ao menos um servidor.")
             plantao.delete()
             return redirect('plantao:pagina_plantao')
 
-        # --- Gera as semanas do plantão (sábado a sexta) ---
+        # Gera as semanas do plantão (sábado a sexta)
         semanas = []
         data_inicio = periodo_inicial
 
-        # Acha o primeiro sábado >= data_inicio
+        # Primeiro sábado >= data_inicio
         while data_inicio.weekday() != 5 and data_inicio <= periodo_final:
             data_inicio += datetime.timedelta(days=1)
 
@@ -225,17 +226,19 @@ def salvar_plantao(request):
             semanas.append((data_inicio, fim_semana))
             data_inicio = fim_semana + datetime.timedelta(days=1)
 
-        # --- Salva as semanas do plantão com rodízio dos servidores ---
+        # Aqui: associa cada semana ao servidor na ORDEM dos IDs enviados
         for i, (semana_inicio, semana_fim) in enumerate(semanas):
-            servidor_id = servidores_ids[i % len(servidores_ids)]
+            try:
+                servidor_id = servidores_ids[i]
+            except IndexError:
+                servidor_id = None  # Se por acaso faltar
             SemanaPlantao.objects.create(
                 plantao=plantao,
                 data_inicio=semana_inicio,
                 data_fim=semana_fim,
                 servidor_id=servidor_id,
-                motivo_bloqueio=''  # ajuste conforme seu modelo
+                motivo_bloqueio=''
             )
-
         messages.success(request, "Plantão salvo com sucesso!")
         return redirect('plantao:pagina_plantao')
     else:

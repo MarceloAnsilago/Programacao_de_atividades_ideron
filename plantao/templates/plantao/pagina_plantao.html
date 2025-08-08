@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="container mt-4 px-4" style="max-width: 1100px;">
-         {% if messages %}
+    {% if messages %}
         <div class="mb-3">
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -30,8 +30,6 @@
                 <i class="bi bi-eye"></i> Ver Plantões
             </a>
         </div>
-            
-         
         <div class="mb-3">
             <h5 class="mb-3 text-secondary">
                 <i class="bi bi-info-circle"></i>
@@ -47,7 +45,7 @@
                         {% include "partials/calendar.html" with name="periodo_final" label="Período Final" required=True value=periodo_final %}
                     </div>
                 </div>
-                
+
                 {% if periodo_inicial and periodo_final %}
                 <div class="row mb-3">
                     <div class="col-md-6">
@@ -91,7 +89,7 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 {% if periodo_inicial and periodo_final and servidores_options %}
                 <div class="row mb-3">
                     <div class="col-12">
@@ -99,12 +97,12 @@
                     </div>
                 </div>
                 {% endif %}
-                
+
                 <div>
                     {% include "partials/botao.html" with type="submit" label="Gerar Plantão" icon="bi bi-gear" class="btn-success" %}
                 </div>
             </form>
-            
+
             {# TABELA DE PLANTÃO: exibe após gerar o plantão #}
             {% if tabela_plantao %}
                 <div class="card mt-4 shadow">
@@ -130,31 +128,39 @@
                         <table class="table table-bordered m-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Semana</th>
-                                    <th>Período</th>
-                                    <th>Servidor</th>
+                                    <tr>
+                                        <th>Semana</th>
+                                        <th>Período</th>
+                                        <th>Servidor</th>
+                                        <th>Telefone</th>
+                                    </tr>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {% for semana in tabela_plantao %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>
-                                            {{ semana.inicio|date:"d/m/Y" }} a {{ semana.fim|date:"d/m/Y" }}
-                                        </td>
-                                        <td>
-                                            {% if semana.servidor %}
-                                                {{ semana.servidor.nome }}
-                                            {% else %}
-                                                <span class="text-danger">Nenhum disponível</span>
-                                                {% if semana.impedido_info %}
-                                                    <br><small class="text-muted">{{ semana.impedido_info }}</small>
+                                <tbody>
+                                    {% for semana in tabela_plantao %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                {{ semana.inicio|date:"d/m/Y" }} a {{ semana.fim|date:"d/m/Y" }}
+                                            </td>
+                                            <td>
+                                                {% if semana.servidor %}
+                                                    {{ semana.servidor.nome }}
+                                                {% else %}
+                                                    <span class="text-danger">Nenhum disponível</span>
+                                                    {% if semana.impedido_info %}
+                                                        <br><small class="text-muted">{{ semana.impedido_info }}</small>
+                                                    {% endif %}
                                                 {% endif %}
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
+                                            </td>
+                                            <td>
+                                                {% if semana.servidor %}
+                                                    {{ semana.servidor.telefone }}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
                         </table>
                     </div>
                 </div>
@@ -189,25 +195,25 @@
                         <form method="post" action="{% url 'plantao:salvar_plantao' %}">
                             {% csrf_token %}
                             <div class="modal-header">
-                            <h5 class="modal-title" id="modalConfirmarPlantaoLabel">Confirmar nome do Plantão</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                <h5 class="modal-title" id="modalConfirmarPlantaoLabel">Confirmar nome do Plantão</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                            <label for="nomePlantao" class="form-label">Nome do Plantão:</label>
-                            <input type="text" class="form-control" id="nomePlantao" name="nome_plantao"
+                                <label for="nomePlantao" class="form-label">Nome do Plantão:</label>
+                                <input type="text" class="form-control" id="nomePlantao" name="nome_plantao"
                                     value="Plantão {{ periodo_inicial }} a {{ periodo_final }}">
-                            <input type="hidden" name="periodo_inicial" value="{{ periodo_inicial }}">
-                            <input type="hidden" name="periodo_final" value="{{ periodo_final }}">
-                            {# Se quiser enviar os servidores, inclua um hidden por id selecionado #}
-                            {% for option in servidores_options %}
-                                {% if option.selected %}
-                                    <input type="hidden" name="servidores_selecionados" value="{{ option.value }}">
-                                {% endif %}
-                            {% endfor %}
+                                <input type="hidden" name="periodo_inicial" value="{{ periodo_inicial }}">
+                                <input type="hidden" name="periodo_final" value="{{ periodo_final }}">
+                                {# Salva a ordem dos servidores conforme tabela #}
+                                {% for semana in tabela_plantao %}
+                                    {% if semana.servidor %}
+                                        <input type="hidden" name="servidores_selecionados" value="{{ semana.servidor.id }}">
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                             <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-success">Salvar</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success">Salvar</button>
                             </div>
                         </form>
                         </div>
