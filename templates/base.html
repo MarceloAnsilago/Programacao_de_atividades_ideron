@@ -144,12 +144,22 @@
             <i class="bi bi-bullseye"></i>
             <span>Metas</span>
         </a>
-        {% if request.user.is_authenticated and request.user.perfilusuario.perfil == 'gerente' %}
-            <a href="#" class="{% if request.path == '/admin/' %}active{% endif %}">
-                <i class="bi bi-gear-fill"></i>
-                <span>Administração</span>
+        {% if perms.organizacao.manage_policies %}
+        {% with name=request.resolver_match.url_name %}
+            <a href="{% url 'organizacao:politicas_lista' %}"
+            class="{% if name == 'politicas_lista' or name == 'politicas_novo' or name == 'politicas_editar' %}active{% endif %}">
+            <i class="bi bi-gear-fill"></i>
+            <span>Administração</span>
             </a>
+
+            <a href="{% url 'organizacao:vinculos_home' %}"
+            class="{% if name == 'vinculos_home' %}active{% endif %}">
+            <i class="bi bi-people-gear"></i>
+            <span>Vínculos</span>
+            </a>
+        {% endwith %}
         {% endif %}
+
         <a href="{% url 'logout' %}">
             <i class="bi bi-box-arrow-right"></i>
             <span>Sair</span>

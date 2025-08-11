@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Selecionar Unidade — {{ perfil.nome }}{% endblock %}
+{% block content %}
+<h2 class="mb-3"><i class="bi bi-people-gear"></i> {{ perfil.nome }} — Selecionar Unidade</h2>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <label class="form-label">Supervisão</label>
+    <select id="supervisao" class="form-select">
+      <option value="">-- selecione --</option>
+      {% for s in supervisoes %}
+        <option value="{{ s.id }}">{{ s.nome }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Unidade</label>
+    <select id="unidade" class="form-select" disabled>
+      <option value="">-- selecione uma supervisão primeiro --</option>
+    </select>
+  </div>
+</div>
+
+<script>
+  const selSup = document.getElementById('supervisao');
+  const selUni = document.getElementById('unidade');
+
+  selSup.addEventListener('change', async () => {
+    const sid = selSup.value;
+    selUni.innerHTML = '';
+    if (!sid) {
+      selUni.disabled = true;
+      selUni.innerHTML = '<option value="">-- selecione uma supervisão primeiro --</option>';
+      return;
+    }
+    const r = await fetch(`/organizacao/api/unidades/${sid}/`);
+    const data = await r.json();
+    selUni.disabled = false;
+    selUni.innerHTML = '<option value="">-- selecione --</option>';
+    data.unidades.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.id; opt.textContent = u.nome;
+      selUni.appendChild(opt);
+    });
+  });
+
+  // ao selecionar a unidade, já abre o editor
+  selUni.addEventListener('change', () => {
+    const uid = selUni.value;
+    if (uid) window.location.href = `/organizacao/vinculos/{{ perfil.id }}/${uid}/`;
+  });
+</script>
+{% endblock %}

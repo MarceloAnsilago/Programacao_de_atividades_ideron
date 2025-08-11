@@ -29,5 +29,6 @@ urlpatterns = [
     path('descanso/', include('descanso.urls')),
     path('plantao/', include('plantao.urls')),
     path('metas/', include(('metas.urls', 'metas'), namespace='metas')),
+    path("organizacao/", include("organizacao.urls")),
     
 ]
